@@ -1,0 +1,71 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+</head>
+<body>
+    <div id="userWelcome" style="display: none">
+        <h2>Hello <span id="userName"></span></h2>
+        <input type="submit" id="btnLogout" value="Log Out" />
+    </div>
+
+    <div id="userForm">
+        <h2>Login:</h2>
+        <p>
+            <label>Email:</label><br />
+            <input type="email" id="userEmail" />
+        </p>
+
+        <p>
+            <label>Password:</label><br />
+            <input type="password" id="userPassword" />
+        </p>
+        <p>
+            <input type="submit" id="userLogin" value="Login" />
+        </p>
+    </div>
+
+    <script>
+
+        document.getElementById("userLogin")
+            .addEventListener("click", async (e) => {
+                e.preventDefault();
+
+                let response = await fetch("/login", {
+                    method: "POST",
+                    headers: {
+                        "Accept": "application/json", "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        email: document.getElementById("userEmail").value,
+                        password: document.getElementById("userPassword").value
+                    })
+                });
+
+                if (response.ok === true) {
+
+                    let data = await response.json();
+
+                    document.getElementById("userWelcome").style.display = "block";
+                    document.getElementById("userForm").style.display = "none";
+                    document.getElementById("userName").innerText = data.email;
+
+                    sessionStorage.setItem("userToken", data.token);
+                }
+            });
+
+        document.getElementById("btnLogout")
+            .addEventListener("click", (e) => {
+                e.preventDefault();
+
+                document.getElementById("userWelcome").style.display = "none";
+                document.getElementById("userForm").style.display = "block";
+                document.getElementById("userName").innerText = "";
+
+                sessionStorage.removeItem("userToken");
+            })
+
+    </script>
+</body>
+</html>
